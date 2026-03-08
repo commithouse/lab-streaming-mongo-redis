@@ -49,6 +49,8 @@ Construir um pipeline de streaming em tempo real que captura eventos de um marke
 └─────────────────────────────────────────────────────────┘
 ```
 
+📘 Detalhamento do pipeline de streaming: [docs/streaming-mongo-redis.md](docs/streaming-mongo-redis.md)
+
 ---
 
 ## 📦 Estrutura do Repositório
@@ -58,6 +60,8 @@ lab-encontro2/
 ├── docker-compose.yml          # MongoDB + Redis + App
 ├── requirements.txt            # Dependências Python
 ├── .env.example                # Variáveis de ambiente
+├── docs/
+│   └── streaming-mongo-redis.md # Explicação do fluxo de streaming
 ├── init/
 │   ├── mongo_seed.py           # Popula MongoDB com dados fake
 │   └── redis_indexes.py        # Cria índices RediSearch
@@ -110,6 +114,10 @@ lab-encontro2/
 ### Passo 1: Pré-requisitos
 - Docker + Docker Compose
 - Python 3.10+
+
+#### Instalação Opcional 
+- [mongo comapps](https://www.mongodb.com/try/download/compass) ide para editar dados no mongo
+- [redis insight](https://redis.io/insight/) ide para editar dados no redis
 
 ### Passo 2: Variáveis de Ambiente
 

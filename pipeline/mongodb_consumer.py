@@ -6,6 +6,7 @@ from typing import Any, Dict
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from redis import Redis
+from redis.exceptions import ResponseError
 
 from event_transformer import hash_key, normalize_event, ranking_key, ts_key
 
@@ -21,17 +22,23 @@ COLLECTION_NAME = "events"
 
 def ensure_ts_add(redis: Redis, key: str, ts: int, value: int, labels: Dict[str, str]) -> None:
     try:
-        redis.execute_command("TS.ADD", key, ts, value)
-    except Exception:
+        # Keep latest value when the same timestamp appears again.
+        redis.execute_command("TS.ADD", key, ts, value, "ON_DUPLICATE", "LAST")
+    except ResponseError as exc:
+        msg = str(exc)
+        if "key does not exist" not in msg and "TSDB: the key does not exist" not in msg:
+            raise
         redis.execute_command(
             "TS.CREATE",
             key,
             "RETENTION",
             604800000,
+            "DUPLICATE_POLICY",
+            "LAST",
             "LABELS",
             *sum(([k, v] for k, v in labels.items()), []),
         )
-        redis.execute_command("TS.ADD", key, ts, value)
+        redis.execute_command("TS.ADD", key, ts, value, "ON_DUPLICATE", "LAST")
 
 
 def apply_to_redis(redis: Redis, event: Dict[str, Any]) -> None:
