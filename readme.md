@@ -209,6 +209,24 @@ series = redis.ts().range(
 )
 ```
 
+### Rodando direto no redis-cli
+```bash
+# Abrir redis-cli no container
+docker exec -it lab-redis redis-cli
+
+# Top 10 restaurantes mais visitados
+ZREVRANGE ranking:restaurants:views 0 9 WITHSCORES
+
+# Top 5 pratos mais buscados
+ZREVRANGE ranking:dishes:searches 0 4 WITHSCORES
+
+# Restaurantes de pizza em Pinheiros com estrelas >= 4.5
+FT.SEARCH idx:restaurants "@cuisine:{pizza} @neighborhood:{Pinheiros} @stars:[4.5 5]" SORTBY views DESC LIMIT 0 10
+
+# Série temporal de views por minuto do restaurante 245
+TS.RANGE ts:resto:245:views - + AGGREGATION sum 60000
+```
+
 ---
 
 ## 🧪 Passo 8: Simulando Carga (Stress Test)
