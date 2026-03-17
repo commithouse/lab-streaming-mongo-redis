@@ -149,7 +149,9 @@ pip install -r requirements.txt
 ```bash
 # 1. Popula MongoDB com 500 restaurantes e 10K eventos fake
 python init/mongo_seed.py
+```
 
+```bash
 # 2. Cria índices no Redis (RediSearch + TimeSeries)
 python init/redis_indexes.py
 ```
@@ -183,7 +185,7 @@ python queries/redis_reader.py
 
 ### Passo 8: Terminal 3 — Dashboard Streamlit (Data View)
 ```bash
-streamlit run data-view.py
+python -m streamlit run data-view.py
 
 ```
 
