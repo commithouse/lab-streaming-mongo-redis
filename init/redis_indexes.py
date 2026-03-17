@@ -47,9 +47,30 @@ def load_restaurant_snapshot() -> Dict[str, dict]:
     return out
 
 
+def load_dish_snapshot() -> Dict[str, dict]:
+    mongo = MongoClient(MONGO_URI)
+    col = mongo[DB_NAME][COLLECTION_NAME]
+    pipeline = [
+        {"$sort": {"ts": -1}},
+        {
+            "$group": {
+                "_id": "$dish_id",
+                "dish_name": {"$first": "$dish_name"},
+                "cuisine": {"$first": "$cuisine"},
+            }
+        },
+    ]
+    out = {}
+    for row in col.aggregate(pipeline):
+        did = row["_id"]
+        out[did] = row
+    return out
+
+
 def main() -> None:
     redis = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     snapshot = load_restaurant_snapshot()
+    dish_snapshot = load_dish_snapshot()
 
     # Seed hash documents: resto:{id}
     for rid, item in snapshot.items():
@@ -87,6 +108,17 @@ def main() -> None:
                 # already exists
                 pass
 
+    # Seed dish catalog hashes: dish:{dish_id}
+    for did, item in dish_snapshot.items():
+        redis.hset(
+            f"dish:{did}",
+            mapping={
+                "dish_id": did,
+                "dish_name": item.get("dish_name", ""),
+                "cuisine": item.get("cuisine", ""),
+            },
+        )
+
     # Recreate RediSearch index (idempotent for lab reruns)
     try:
         redis.execute_command("FT.DROPINDEX", "idx:restaurants", "DD")
@@ -105,7 +137,10 @@ def main() -> None:
         definition=IndexDefinition(prefix=["resto:"], index_type=IndexType.HASH),
     )
 
-    print(f"[REDIS] idx:restaurants criado com {len(snapshot)} documentos.")
+    print(
+        f"[REDIS] idx:restaurants criado com {len(snapshot)} documentos. "
+        f"Catalogo de pratos: {len(dish_snapshot)}."
+    )
 
 
 if __name__ == "__main__":

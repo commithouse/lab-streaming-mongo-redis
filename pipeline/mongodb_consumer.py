@@ -53,6 +53,15 @@ def apply_to_redis(redis: Redis, event: Dict[str, Any]) -> None:
             "location": f"{event['lon']},{event['lat']}",
         },
     )
+    # Keep a Redis-only dish catalog for dashboards/readers.
+    redis.hset(
+        f"dish:{event['dish_id']}",
+        mapping={
+            "dish_id": event["dish_id"],
+            "dish_name": event["dish_name"],
+            "cuisine": event["cuisine"],
+        },
+    )
 
     if event["type"] == "view":
         score = redis.zincrby("ranking:restaurants:views", 1, event["restaurant_id"])

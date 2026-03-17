@@ -17,6 +17,11 @@ def top_dishes(redis: Redis, n: int = 5) -> List[Tuple[str, float]]:
     return redis.zrevrange("ranking:dishes:searches", 0, n - 1, withscores=True)
 
 
+def dish_name(redis: Redis, dish_id: str) -> str:
+    name = redis.hget(f"dish:{dish_id}", "dish_name")
+    return name or dish_id
+
+
 def pizza_pinheiros(redis: Redis):
     query = (
         Query("@cuisine:{pizza} @neighborhood:{Pinheiros}")
@@ -49,7 +54,7 @@ def main() -> None:
 
         print_block("Top 5 pratos mais buscados")
         for idx, (member, score) in enumerate(top_dishes(redis), start=1):
-            print(f"{idx:02d}. {member} -> {int(score)} buscas")
+            print(f"{idx:02d}. {dish_name(redis, member)} ({member}) -> {int(score)} buscas")
 
         print_block("Pizza em Pinheiros com 4.5+ estrelas (RediSearch)")
         try:
