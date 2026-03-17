@@ -146,13 +146,14 @@ pip install -r requirements.txt
 ```
 
 ### Passo 5: Inicializar dados e índices
-```bash
+
 # 1. Popula MongoDB com 500 restaurantes e 10K eventos fake
+```bash
 python init/mongo_seed.py
 ```
 
-```bash
 # 2. Cria índices no Redis (RediSearch + TimeSeries)
+```bash
 python init/redis_indexes.py
 ```
 
