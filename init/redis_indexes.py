@@ -8,6 +8,8 @@ from redis import Redis
 from redis.commands.search.field import GeoField, NumericField, TagField, TextField
 from redis.commands.search.index_definition import IndexDefinition, IndexType
 
+# Load .env.local first (for host development), fallback to .env (for Docker)
+load_dotenv(".env.local")
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/?directConnection=true")

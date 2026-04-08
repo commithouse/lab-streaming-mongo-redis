@@ -1,12 +1,17 @@
+import os
 import time
 from typing import List, Tuple
 
+from dotenv import load_dotenv
 from redis import Redis
 from redis.commands.search.query import NumericFilter, Query
 
+# Load .env.local first (for host development), fallback to .env (for Docker)
+load_dotenv(".env.local")
+load_dotenv()
 
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
 
 
 def top_restaurants(redis: Redis, n: int = 10) -> List[Tuple[str, float]]:

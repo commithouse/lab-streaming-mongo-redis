@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 from redis import Redis
 from redis.commands.search.query import NumericFilter, Query
 
+# Load .env.local first (for host development), fallback to .env (for Docker)
+load_dotenv(".env.local")
 load_dotenv()
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")

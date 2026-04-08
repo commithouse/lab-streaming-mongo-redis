@@ -10,6 +10,8 @@ from redis.exceptions import ResponseError
 
 from event_transformer import hash_key, normalize_event, ranking_key, ts_key
 
+# Load .env.local first (for host development), fallback to .env (for Docker)
+load_dotenv(".env.local")
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/?directConnection=true")
